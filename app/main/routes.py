@@ -47,17 +47,16 @@ def index():
 
     page = request.args.get('page', 1, type = int)
     sql = sqlalchemy.select(Part, LegacyPart).join(LegacyPart)
-    parts, legacy_parts = [[Part(id=x.id, name=x.name, desc=x.desc, img_url=x.img_url), LegacyPart(id=x.id, quantity=y.quantity)] for x,y in db.session.execute(sql)]
+    parts, legacy_parts = ((x,y) for x,y in db.session.execute(sql))
 
     # next_url = url_for('main.index', page = parts.next_num) if parts.has_next else None
     # prev_url = url_for('main.index', page = parts.prev_num) if parts.has_prev else None
 
-    return render_template(
-            'index.html',
-            title = _('Home'),
-            form = form,
-            parts = parts,
-            legacy_parts = legacy_parts,
+    return render_template('index.html',
+                           title = _('Home'),
+                           form = form,
+                           parts = parts,
+                           legacy_parts = legacy_parts,
     )
 
 @bp.route('/user/<username>')
